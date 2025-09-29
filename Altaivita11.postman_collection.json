@@ -1,0 +1,1010 @@
+{
+	"info": {
+		"_postman_id": "d4afb40a-5e76-4682-bc8f-a0af97d3ec8a",
+		"name": "Altaivita11",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json",
+		"_exporter_id": "36773751"
+	},
+	"item": [
+		{
+			"name": "Добавление товара в корзину",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"sum_quantity\", \"0\");\r",
+							"console.log(pm.collectionVariables.get(\"sum_quantity\"));\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is less than 400ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Товар в корзине\", function() {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.btn_text).to.eql(\"Добавлено\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"sum_quantity\", pm.response.json().sum_quantity)\r",
+							"\r",
+							"pm.collectionVariables.set(\"new_quantity\", pm.response.json().new_quantity)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followRedirects": true,
+				"disableUrlEncoding": true,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "S_customerID",
+						"value": "{{customer_id}}",
+						"type": "text"
+					},
+					{
+						"key": "S_wh",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "S_CID",
+						"value": "{{s_cid}}",
+						"type": "text"
+					},
+					{
+						"key": "S_cur_code",
+						"value": "rub",
+						"type": "text"
+					},
+					{
+						"key": "LANG_key",
+						"value": "ru",
+						"type": "text"
+					},
+					{
+						"key": "S_koef",
+						"value": "0",
+						"type": "text"
+					},
+					{
+						"key": "quantity",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "product_id",
+						"value": "{{product_id}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "product_id",
+							"value": "{{product_id}}",
+							"type": "text"
+						},
+						{
+							"key": "this_listID",
+							"value": "search_list",
+							"type": "text"
+						},
+						{
+							"key": "LANG_key",
+							"value": "ru",
+							"type": "text"
+						},
+						{
+							"key": "S_wh",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "S_CID",
+							"value": "{{s_cid}}",
+							"type": "text"
+						},
+						{
+							"key": "S_cur_code",
+							"value": "rub",
+							"type": "text"
+						},
+						{
+							"key": "S_koef",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "S_customerID",
+							"value": "{{customer_id}}",
+							"type": "text"
+						},
+						{
+							"key": "",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": "{{base_url}}cart/add_products_to_cart_from_preview.php"
+			},
+			"response": []
+		},
+		{
+			"name": "Просмотр корзины",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Content-Type is present\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\");\r",
+							"});\r",
+							"pm.test(\"Response time is less than 400ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(400);\r",
+							"});\r",
+							"\r",
+							"var itemID = pm.collectionVariables.set(\"itemID\");\r",
+							"\r",
+							"var responseBody = pm.response.text();\r",
+							"// Используем регулярное выражение для извлечения значения data-item-id\r",
+							"var itemIdMatch = responseBody.match(/data-item-id=\"(\\d+)\"/);\r",
+							"// Проверяем, найдено ли значение\r",
+							"if (itemIdMatch && itemIdMatch[1]) {\r",
+							"    // Записываем значение в переменную itemID\r",
+							"    itemID = itemIdMatch[1]; // Use previously declared itemID\r",
+							"    pm.collectionVariables.set(\"itemID\", itemID); // Сохраняем в переменной коллекции\r",
+							"    console.log(\"itemID:\", itemID); // Выводим в консоль для проверки\r",
+							"} else {\r",
+							"    console.log(\"data-item-id не найден\");\r",
+							"}"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded",
+						"type": "text"
+					},
+					{
+						"key": "LANG_key",
+						"value": "ru",
+						"type": "text"
+					},
+					{
+						"key": "S-wh",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "S_CID",
+						"value": "{{s_cid}}",
+						"type": "text"
+					},
+					{
+						"key": "S_cur-code",
+						"value": "rub",
+						"type": "text"
+					},
+					{
+						"key": "S_koef",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "S_customer_id",
+						"value": "{{customer_id}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "LANG_key",
+							"value": "ru",
+							"type": "text"
+						},
+						{
+							"key": "S_wh",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "S_SID",
+							"value": "{{s_cid}}",
+							"type": "text"
+						},
+						{
+							"key": "S_koef",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "S_customerID",
+							"value": "{{customer_id}}",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{base_url}}cart/ajax_show_cart_preview.php?LANG_key=ru&S_wh=1&S_CID={{s_cid}}&S_cur_code=rub&S_koef=1&S_hint_code=&S_customerID={{customer_id}}",
+					"host": [
+						"{{base_url}}cart"
+					],
+					"path": [
+						"ajax_show_cart_preview.php"
+					],
+					"query": [
+						{
+							"key": "LANG_key",
+							"value": "ru"
+						},
+						{
+							"key": "S_wh",
+							"value": "1"
+						},
+						{
+							"key": "S_CID",
+							"value": "{{s_cid}}"
+						},
+						{
+							"key": "S_cur_code",
+							"value": "rub"
+						},
+						{
+							"key": "S_koef",
+							"value": "1"
+						},
+						{
+							"key": "S_hint_code",
+							"value": ""
+						},
+						{
+							"key": "S_customerID",
+							"value": "{{customer_id}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Увеличение количества товара Copy",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"// Fixed SyntaxError in console log statement\r",
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is less than 400ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(400);\r",
+							"});\r",
+							"\r",
+							"\r",
+							"pm.test(\"Товар в корзине\", function() {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    console.log(jsonData); // Выводим весь ответ в консоль\r",
+							"    pm.expect(jsonData.btn_text).to.eql(\"Добавлено\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"sum_quantity\", pm.response.json().sum_quantity);\r",
+							"console.log(\"sum_quantity:\", pm.response.json().sum_quantity); // Fixed SyntaxError here\r",
+							"\r",
+							"pm.collectionVariables.set(\"sum_quantity\", pm.response.json().sum_quantity);\r",
+							"\r",
+							"pm.test(\"Количество соответствует ожидаемому\", function() {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.sum_quantity).to.eql(jsonData.total_quantity_items);    \r",
+							"});\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followRedirects": true,
+				"disableUrlEncoding": true,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "S_CID",
+						"value": "{{s_cid}}",
+						"type": "text"
+					},
+					{
+						"key": "S_customerID",
+						"value": "{{customer_id}}",
+						"type": "text"
+					},
+					{
+						"key": "S_wh",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "S_cur_code",
+						"value": "rub",
+						"type": "text"
+					},
+					{
+						"key": "LANG_key",
+						"value": "ru",
+						"type": "text"
+					},
+					{
+						"key": "S_koef",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "action",
+						"value": "update_quantity",
+						"type": "text"
+					},
+					{
+						"key": "quantity",
+						"value": "3",
+						"type": "text"
+					},
+					{
+						"key": "data-item-id",
+						"value": "{{itemID}}",
+						"type": "text"
+					},
+					{
+						"key": "action",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "product_id",
+							"value": "4529",
+							"type": "text"
+						},
+						{
+							"key": "this_listID",
+							"value": "search_list",
+							"type": "text"
+						},
+						{
+							"key": "LANG_key",
+							"value": "ru",
+							"type": "text"
+						},
+						{
+							"key": "S_wh",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "S_CID",
+							"value": "{{s_cid}}",
+							"type": "text"
+						},
+						{
+							"key": "S_cur_code",
+							"value": "rub",
+							"type": "text"
+						},
+						{
+							"key": "S_koef",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "3",
+							"type": "text"
+						},
+						{
+							"key": "S_customerID",
+							"value": "{{customer_id}}",
+							"type": "text"
+						},
+						{
+							"key": "itemID",
+							"value": "{{itemID}}",
+							"type": "text"
+						},
+						{
+							"key": "action",
+							"value": "update_quantity",
+							"type": "text"
+						}
+					]
+				},
+				"url": "{{base_url}}cart/action_with_basket_on_cart_page.php"
+			},
+			"response": []
+		},
+		{
+			"name": "Удаление товара",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Content-Type is present\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\");\r",
+							"});\r",
+							"pm.test(\"Response time is less than 400ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(400);\r",
+							"});\r",
+							"pm.test(\"Товар удален\", function() {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.products_amount).to.eql(0);\r",
+							"}); // Added missing closing parenthesis\r",
+							"\r",
+							"pm.collectionVariables.set(\"sum_quantity\", pm.response.json().sum_quantity)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "*/*"
+					},
+					{
+						"key": "Accept-Language",
+						"value": "ru,en-US;q=0.9,en;q=0.8"
+					},
+					{
+						"key": "Connection",
+						"value": "keep-alive"
+					},
+					{
+						"key": "product_id",
+						"value": "{{product_id}}"
+					},
+					{
+						"key": "LANG_key",
+						"value": "ru"
+					},
+					{
+						"key": "S_wh",
+						"value": "1"
+					},
+					{
+						"key": "S_CID",
+						"value": "{{s_cid}}"
+					},
+					{
+						"key": "S_cur_code",
+						"value": "ru"
+					},
+					{
+						"key": "S_koef",
+						"value": "1"
+					},
+					{
+						"key": "S_customerID",
+						"value": "{{customer_id}}"
+					},
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					},
+					{
+						"key": "",
+						"value": "",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "product_id",
+							"value": "{{product_id}}",
+							"type": "text"
+						},
+						{
+							"key": "LANG_key",
+							"value": "ru",
+							"type": "text"
+						},
+						{
+							"key": "S-wh",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "S_CID",
+							"value": "{{s_cid}}",
+							"type": "text"
+						},
+						{
+							"key": "S_cur_code",
+							"value": "rub",
+							"type": "text"
+						},
+						{
+							"key": "S_koef",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "S_customerID",
+							"value": "{{customer_id}}",
+							"type": "text"
+						},
+						{
+							"key": "quantity_to_delete",
+							"value": "3",
+							"type": "text"
+						}
+					]
+				},
+				"url": "{{base_url}}cart/delete_products_from_cart_preview.php",
+				"description": "Generated from cURL: curl 'https://altaivita.ru/engine/cart/delete_products_from_cart_preview.php' \\\r\n  -H 'Accept: */*' \\\r\n  -H 'Accept-Language: ru,en-US;q=0.9,en;q=0.8' \\\r\n  -H 'Connection: keep-alive' \\\r\n  -H 'Content-Type: application/x-www-form-urlencoded; charset=UTF-8' \\\r\n  -b $'PHPSESSID=85nvrppqrpdodblp4jh5u50o24; CID=7bcaacbcb4a0c5a56a341b9fb1109568; _userGUID=0:m7969xn4:bJWnlmRGVFV5vMNFbOYArJTWr94S0RmH; _userGUID=0:m7969xn4:bJWnlmRGVFV5vMNFbOYArJTWr94S0RmH; _ga=GA1.1.956781069.1739803824; _ym_uid=173980382450635847; _ym_d=1739803824; llk_hash_login_customerID=372502; llk_hash=e9393a356f5ec4e9f381b5ff4d9c9e5e; site_countryID=247; site_country_name=%D0%A0%D0%BE%D1%81%D1%81%D0%B8%D0%B9%D1%81%D0%BA%D0%B0%D1%8F+%D0%A4%D0%B5%D0%B4%D0%B5%D1%80%D0%B0%D1%86%D0%B8%D1%8F; _dvs=0:m7taqhsl:iFg6A6R7FnVjDbadqYV3CHfl4QIWQOJF; _ym_isad=2; _ym_visorc=w; dSesn=8c658ed6-3a93-ca99-d2e1-8c4b271689d7; digi_uc=|v:173998:6135:6128\\u0021174006:6134\\u0021174007:6127:6130:6132\\u0021174085:2814\\u0021174102:3548|s:174085:2814\\u0021174102:5648; DIGI_CARTID=60151419940; _ga_2JB65Y3D22=GS1.1.1741020637.18.1.1741023970.0.0.0' \\\r\n  -H 'Origin: https://altaivita.ru' \\\r\n  -H 'Referer: https://altaivita.ru/cart/' \\\r\n  -H 'Sec-Fetch-Dest: empty' \\\r\n  -H 'Sec-Fetch-Mode: cors' \\\r\n  -H 'Sec-Fetch-Site: same-origin' \\\r\n  -H 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36' \\\r\n  -H 'X-Requested-With: XMLHttpRequest' \\\r\n  -H 'sec-ch-ua: \"Not(A:Brand\";v=\"99\", \"Google Chrome\";v=\"133\", \"Chromium\";v=\"133\"' \\\r\n  -H 'sec-ch-ua-mobile: ?0' \\\r\n  -H 'sec-ch-ua-platform: \"Windows\"' \\\r\n  --data-raw 'product_id=2814&LANG_key=ru&S_wh=1&S_CID=7bcaacbcb4a0c5a56a341b9fb1109568&S_cur_code=rub&S_koef=1&S_hint_code=&S_customerID=372502'"
+			},
+			"response": []
+		},
+		{
+			"name": "Просмотр после удаления",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"pm.test(\"Content-Type is present\", function () {\r",
+							"    pm.response.to.have.header(\"Content-Type\");\r",
+							"});\r",
+							"pm.test(\"Response time is less than 200ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(400);\r",
+							"});\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "checkout",
+						"value": "cart",
+						"type": "text"
+					},
+					{
+						"key": "Content-Type",
+						"value": "application/x-www-form-urlencoded; charset=UTF-8",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "product_id",
+							"value": "{{product_id}}",
+							"type": "text"
+						},
+						{
+							"key": "LANG_key",
+							"value": "ru",
+							"type": "text"
+						},
+						{
+							"key": "S_wh",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "S_CID",
+							"value": "{{s_cid}}",
+							"type": "text"
+						},
+						{
+							"key": "S_cur_code",
+							"value": "rub",
+							"type": "text"
+						},
+						{
+							"key": "S_koef",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "S_customerID",
+							"value": "{{customer_id}}",
+							"type": "text"
+						},
+						{
+							"key": "action",
+							"value": "ecom_link_products_cart",
+							"type": "text"
+						}
+					]
+				},
+				"url": "{{base_url}}/ajax/ajax_ecommerce/ajax_ecommerce.php"
+			},
+			"response": []
+		},
+		{
+			"name": "Негативный добавление товара с несуществующим номером",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"sum_quantity\", \"0\");\r",
+							"console.log(pm.collectionVariables.get(\"sum_quantity\"));\r",
+							"\r",
+							"\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Response time is less than 400ms\", function () {\r",
+							"    pm.expect(pm.response.responseTime).to.be.below(400);\r",
+							"});\r",
+							"\r",
+							"pm.test(\"Товар в корзине\", function() {\r",
+							"    var jsonData = pm.response.json();\r",
+							"    pm.expect(jsonData.btn_text).to.eql(\"Добавлено\");\r",
+							"});\r",
+							"\r",
+							"pm.collectionVariables.set(\"sum_quantity\", pm.response.json().sum_quantity)\r",
+							"\r",
+							"pm.collectionVariables.set(\"new_quantity\", pm.response.json().new_quantity)"
+						],
+						"type": "text/javascript",
+						"packages": {}
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"followRedirects": true,
+				"disableUrlEncoding": true,
+				"disabledSystemHeaders": {}
+			},
+			"request": {
+				"auth": {
+					"type": "noauth"
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "S_customerID",
+						"value": "{{customer_id}}",
+						"type": "text"
+					},
+					{
+						"key": "S_wh",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "S_CID",
+						"value": "{{s_cid}}",
+						"type": "text"
+					},
+					{
+						"key": "S_cur_code",
+						"value": "rub",
+						"type": "text"
+					},
+					{
+						"key": "LANG_key",
+						"value": "ru",
+						"type": "text"
+					},
+					{
+						"key": "S_koef",
+						"value": "0",
+						"type": "text"
+					},
+					{
+						"key": "quantity",
+						"value": "1",
+						"type": "text"
+					},
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					},
+					{
+						"key": "product_id",
+						"value": "{{product_id}}",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "urlencoded",
+					"urlencoded": [
+						{
+							"key": "product_id",
+							"value": "99999999",
+							"type": "text"
+						},
+						{
+							"key": "this_listID",
+							"value": "search_list",
+							"type": "text"
+						},
+						{
+							"key": "LANG_key",
+							"value": "ru",
+							"type": "text"
+						},
+						{
+							"key": "S_wh",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "S_CID",
+							"value": "{{s_cid}}",
+							"type": "text"
+						},
+						{
+							"key": "S_cur_code",
+							"value": "rub",
+							"type": "text"
+						},
+						{
+							"key": "S_koef",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "quantity",
+							"value": "1",
+							"type": "text"
+						},
+						{
+							"key": "S_customerID",
+							"value": "{{customer_id}}",
+							"type": "text"
+						},
+						{
+							"key": "",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						},
+						{
+							"key": "",
+							"value": "",
+							"type": "text",
+							"disabled": true
+						}
+					]
+				},
+				"url": "{{base_url}}cart/add_products_to_cart_from_preview.php"
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "https://altaivita.ru/engine/"
+		},
+		{
+			"key": "s_cid",
+			"value": "76a701dd27b7e7511db257c6510b8302"
+		},
+		{
+			"key": "customer_id",
+			"value": "372502"
+		},
+		{
+			"key": "new_quantity",
+			"value": "1"
+		},
+		{
+			"key": "product_id",
+			"value": "710"
+		},
+		{
+			"key": "itemID",
+			"value": "933435"
+		},
+		{
+			"key": "sum_quantity",
+			"value": ""
+		},
+		{
+			"key": "quantity_to_delete",
+			"value": "3"
+		},
+		{
+			"value": "",
+			"disabled": true
+		}
+	]
+}
