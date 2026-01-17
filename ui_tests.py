@@ -47,7 +47,7 @@ def test_cart_is_empty(browser):
     cart_page.delete_goods_from_cart()
     sleep(10)
     total_sum = cart_page.get_total_sum_from_cart()
-    #assert total_sum.replace('₽', '').strip().isdigit() and len(total_sum.replace('₽', '').strip()) == 1
+    
     assert total_sum.replace('₽', '').strip() == '0', "Сумма в корзине не равна 0"
 
 
