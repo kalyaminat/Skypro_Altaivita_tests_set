@@ -1,4 +1,4 @@
-# KalyaminaT_15jan1963
+# Skypro_Altaivita_tests_set
 
 ## Технические детали
 - **Язык программирования**: Python
