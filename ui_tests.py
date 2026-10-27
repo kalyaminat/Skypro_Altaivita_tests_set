@@ -1,54 +1,72 @@
-from Altaivita.uipages.Mainpage import MainPage
-from Altaivita.uipages.Cartpage import CartPage
-from .conftest import browser
-from time import sleep
+from decimal import Decimal
+
 import allure
-from .constants import main_url, cart_url
+
+from uipages.Mainpage import MainPage
+from uipages.Cartpage import CartPage
 
 
 @allure.severity("Critical")
 @allure.epic("UI")
 @allure.title("Добавление товара в корзину")
-@allure.description("Добавление товара и превью цены товара в корзине на главной странице")
 def test_main_page(browser):
     main_page = MainPage(browser)
     main_page.open()
     main_page.add_product()
-    main_page.get_mini_cart_price()
-    assert main_page.get_mini_cart_price() != '0 ₽', "Сумма в корзине нулевая"
+
+    with allure.step("Проверить, что сумма мини-корзины больше нуля"):
+        price = CartPage.parse_price(main_page.get_mini_cart_price())
+        assert price > Decimal("0"), "Сумма мини-корзины не больше нуля"
+
 
 @allure.severity("Critical")
 @allure.epic("UI")
-@allure.title("Проверка суммы")
-@allure.description("Переход на страницу корзины, проверка суммы")
+@allure.title("Сумма корзины совпадает с суммой мини-корзины")
 def test_sum_cart_page(browser):
     main_page = MainPage(browser)
     main_page.open()
     main_page.add_product()
+
+    mini_cart_sum = CartPage.parse_price(
+        main_page.get_mini_cart_price()
+    )
+
     main_page.go_to_cart()
-    cart_page = CartPage(browser, browser.current_url)
-    cart_page.open()
-    cart_page.get_total_sum_from_cart()
-    total_sum = cart_page.get_total_sum_from_cart()
-    assert total_sum.replace('₽','').strip().isdigit() and len(total_sum.replace('₽','').strip()) > 1, \
-        "Сумма в корзмне состоит из одного знака 0"
+    cart_page = CartPage(browser)
+
+    with allure.step("Проверить сумму товаров в корзине"):
+        total_sum = CartPage.parse_price(
+            cart_page.get_total_sum_from_cart()
+        )
+
+        assert total_sum > Decimal("0"), "Сумма корзины не больше нуля"
+        assert total_sum == mini_cart_sum, (
+            f"Сумма корзины {total_sum} "
+            f"не совпадает с мини-корзиной {mini_cart_sum}"
+        )
+
 
 @allure.severity("Critical")
 @allure.epic("UI")
-@allure.title("Удаление товаров их корзины")
-@allure.description("Удаление товаров и проверка, что сумма равна 0")
+@allure.title("Удаление единственного товара из корзины")
 def test_cart_is_empty(browser):
     main_page = MainPage(browser)
     main_page.open()
     main_page.add_product()
     main_page.go_to_cart()
+
     cart_page = CartPage(browser)
-    cart_page.open()
+
+    with allure.step("Убедиться, что перед удалением корзина не пустая"):
+        initial_sum = CartPage.parse_price(
+            cart_page.get_total_sum_from_cart()
+        )
+        assert initial_sum > Decimal("0"), "Корзина уже пустая"
+
     cart_page.delete_goods_from_cart()
-    sleep(10)
-    total_sum = cart_page.get_total_sum_from_cart()
-    
-    assert total_sum.replace('₽', '').strip() == '0', "Сумма в корзине не равна 0"
 
-
-
+    with allure.step("Проверить нулевую сумму после удаления"):
+        total_sum = CartPage.parse_price(
+            cart_page.get_total_sum_from_cart()
+        )
+        assert total_sum == Decimal("0"), "Сумма корзины не равна нулю"
