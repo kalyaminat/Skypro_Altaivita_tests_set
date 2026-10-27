@@ -3,9 +3,15 @@ import allure
 
 
 class Apipage:
-    def __init__(self, base_url: str, s_cid: str):
+    def __init__(
+        self,
+        base_url: str,
+        s_cid: str,
+        session: requests.Session,
+    ):
         self.base_url = base_url
         self.s_cid = s_cid
+        self.session = session
 
     @allure.step("API. Добавление товара в корзину")
     def add_product_to_cart(self, product_id: int, customer_id: int) -> requests.Response:
@@ -19,9 +25,13 @@ class Apipage:
             "quantity": 1,
             "S_customerID": customer_id,
         }
-        headers = {"Content_Type":  "application/x-www-form-unlencoded"}
 
-        response = requests.post(self.base_url + "cart/add_products_to_cart_from_preview.php", data=data, headers=headers)
+
+        response = self.session.post(
+            self.base_url + "cart/add_products_to_cart_from_preview.php",
+            data=data,
+            timeout=(10, 20),
+        )
         return response
 
     @allure.step("API. Удаление товара из корзины")
@@ -38,9 +48,12 @@ class Apipage:
             "S_customerID": customer_id,
         }
 
-        headers = {"Content_Type": "application/x-www-form-unlencoded"}
 
-        response = requests.post(self.base_url + "cart/delete_products_from_cart_preview.php", data=data, headers=headers)
+        response = self.session.post(
+            self.base_url + "cart/delete_products_from_cart_preview.php",
+            data=data,
+            timeout=(10, 20),
+        )
         return response
 
     @allure.step("API. Проверка корзины после удаления")
@@ -56,9 +69,12 @@ class Apipage:
             "S_customerID": customer_id,
         }
 
-        headers = {"Content_Type": "application/x-www-form-unlencoded"}
 
-        response = requests.post(self.base_url + "ajax/ajax_ecommerce/ajax_ecommerce.php", data=data, headers=headers)
+        response = self.session.post(
+            self.base_url + "ajax/ajax_ecommerce/ajax_ecommerce.php",
+            data=data,
+            timeout=(10, 20),
+        )
         return response
 
 
