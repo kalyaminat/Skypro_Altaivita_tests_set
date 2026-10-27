@@ -1,41 +1,65 @@
-from selenium.common import TimeoutException
+from decimal import Decimal
+
+import allure
+from selenium.webdriver.common.by import By
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.webdriver.support.wait import WebDriverWait
-from selenium.webdriver.common.by import By
-from Altaivita.constants import cart_url
-import allure
+
+from constants import cart_url
+
 
 class CartPage:
-    def __init__(self, browser, url = cart_url):
+    TOTAL_SUM = (
+        By.CSS_SELECTOR,
+        "span.js-total_products_amount",
+    )
+    DELETE_BUTTON = (
+        By.CSS_SELECTOR,
+        "div.basket__delete.js-item-delete",
+    )
+
+    def __init__(self, browser, url=cart_url, timeout=15):
         self.browser = browser
         self.url = url
+        self.wait = WebDriverWait(browser, timeout)
 
     @allure.step("UI. Открыть страницу корзины")
     def open(self):
         self.browser.get(self.url)
-    @allure.step("UI. Проверить сумму в корзине")
+
+    @allure.step("UI. Получить сумму в корзине")
     def get_total_sum_from_cart(self):
-        total_sum = self.browser.find_element(By.CSS_SELECTOR, 'span.js-total_products_amount').text
-        return total_sum
+        element = self.wait.until(
+            EC.visibility_of_element_located(self.TOTAL_SUM)
+        )
+        return element.text.strip()
 
-    # def cart_is_not_empty(self):
-    #     item = WebDriverWait(self.browser, 10).until(
-    #         EC.visibility_of_element_located((By.CSS_SELECTOR, '.basket__item')))
-    #     return item
-    @allure.step("UI. Удаление товара из корзины")
+    @staticmethod
+    def parse_price(text):
+        normalized = (
+            text.replace("₽", "")
+            .replace(" ", "")
+            .replace("\u00a0", "")
+            .replace("\u202f", "")
+            .replace(",", ".")
+            .strip()
+        )
+        return Decimal(normalized)
+
+    @allure.step("UI. Удалить товар из корзины")
     def delete_goods_from_cart(self):
-        delete_button = WebDriverWait(self.browser, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "div.basket__delete.js-item-delete")))
-        delete_button.click()
-        self.browser.implicitly_wait(5)
+        self.wait.until(
+            EC.element_to_be_clickable(self.DELETE_BUTTON)
+        ).click()
 
-    # def check_cart(self):
-    #     try:
-    #         WebDriverWait(self.browser, 4).until(
-    #             EC.presence_of_element_located((By.CSS_SELECTOR, '.basket__item')))
-    #     except TimeoutException:
-    #         return False
-    #     return True
+        self.wait.until(
+            EC.text_to_be_present_in_element(self.TOTAL_SUM, "0"),
+            message="После удаления не появилось значение суммы с нулём",
+        )
 
-
-
+        self.wait.until(
+            lambda browser: self.parse_price(
+                browser.find_element(*self.TOTAL_SUM).text
+            ) == Decimal("0"),
+            message="Сумма корзины не стала равна нулю после удаления",
+        )
